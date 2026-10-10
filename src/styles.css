@@ -1,0 +1,1205 @@
+/* ==========================================================================
+   Colour tokens — the only place colours are defined.
+   light-dark() picks the value for the active colour scheme; the canvas
+   renderer reads the same tokens through src/ui/theme.ts.
+   ========================================================================== */
+:root {
+  color-scheme: light dark;
+
+  /* App surfaces */
+  --bg: light-dark(#e2e8f0, #131a27);
+  --titlebar: light-dark(#e2e8f0, #131a27);
+  --surface: light-dark(#f5f7fa, #1a2232);
+  --surface-raised: light-dark(#ffffff, #212a3d);
+  --surface-sunken: light-dark(#e9eef4, #161d2b);
+  --border: light-dark(#cdd5e0, #2c3750);
+  --ink: light-dark(#131c2e, #e8edf6);
+  --ink-muted: light-dark(#4f5b72, #9ba7bf);
+  --accent: light-dark(#2347d9, #869dff);
+  --accent-ink: light-dark(#ffffff, #0d1530);
+  --accent-soft: light-dark(#dfe6ff, #26315a);
+  --focus: light-dark(#2347d9, #b3c1ff);
+  --shadow: light-dark(rgb(28 40 72 / 0.10), rgb(0 0 0 / 0.35));
+  --scrim: light-dark(rgb(241 245 250 / 0.72), rgb(19 26 39 / 0.72));
+  --backdrop: light-dark(rgb(19 28 46 / 0.35), rgb(5 8 14 / 0.6));
+
+  /* Board and pieces (read by the canvas renderer) */
+  --board: light-dark(#fbfcfe, #1c2435);
+  --board-alt: light-dark(#f0f3f8, #20293c);
+  --snake: light-dark(#2347d9, #7f97ff);
+  --snake-shine: light-dark(#7c96ff, #c3cfff);
+  --snake-eye: light-dark(#ffffff, #10172a);
+  --snake-pupil: light-dark(#0c1638, #f2f5ff);
+  --snake-dead: light-dark(#a3abb9, #566176);
+  --snake-flash: light-dark(#5ec8ff, #e5f3ff);
+  --food: light-dark(#ef6618, #ff8a3d);
+  --food-leaf: light-dark(#2f9a58, #58c784);
+  --golden: light-dark(#e0a100, #ffc935);
+  --fruit-shine: light-dark(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.4));
+
+  --radius-frame: 22px;
+  --radius-control: 11px;
+  --font: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --titlebar-height: 52px;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+svg .fill {
+  fill: currentColor;
+}
+
+:focus-visible {
+  outline: 2.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ==========================================================================
+   App shell
+   ========================================================================== */
+.app {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100vh;
+  height: 100dvh;
+}
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: var(--titlebar-height);
+  padding: 0 10px 0 16px;
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(10px, env(safe-area-inset-right));
+  background: var(--titlebar);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+
+/* Installed on Chrome/Edge with window-controls-overlay: the toolbar becomes the title bar. */
+@media (display-mode: window-controls-overlay) {
+  .titlebar {
+    margin-left: env(titlebar-area-x, 0);
+    width: env(titlebar-area-width, 100%);
+    height: env(titlebar-area-height, var(--titlebar-height));
+    padding: 0 8px 0 12px;
+    border-bottom: 0;
+    app-region: drag;
+    -webkit-app-region: drag;
+  }
+
+  .titlebar button {
+    app-region: no-drag;
+    -webkit-app-region: no-drag;
+  }
+
+  .tool {
+    width: 32px;
+    height: 30px;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+
+.brand-mark-bg {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.brand-mark-body {
+  stroke: var(--accent-ink);
+  stroke-width: 3.4;
+}
+
+.brand-mark-head {
+  fill: var(--accent-ink);
+  stroke: none;
+}
+
+.brand-mark-eye {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.brand-mark-food {
+  fill: var(--food);
+  stroke: none;
+}
+
+.brand-name {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tool {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink-muted);
+  transition: background-color 120ms, color 120ms;
+}
+
+.tool svg {
+  width: 21px;
+  height: 21px;
+}
+
+.tool:hover:not(:disabled) {
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+
+.tool:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.tool .icon-play {
+  display: none;
+}
+
+.tool[data-paused='true'] .icon-play {
+  display: block;
+  fill: currentColor;
+}
+
+.tool[data-paused='true'] .icon-pause {
+  display: none;
+}
+
+.tool-install {
+  display: inline-flex;
+  gap: 6px;
+  width: auto;
+  padding: 0 12px 0 9px;
+  margin-right: 6px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.tool-install:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-ink);
+  filter: brightness(1.08);
+}
+
+.tool-install svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ==========================================================================
+   Layout: board in a window-like frame, score panel at the side
+   ========================================================================== */
+.layout {
+  display: grid;
+  grid-template-columns: var(--frame-w, minmax(0, 1fr)) 236px;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    'frame score'
+    'frame dpad'
+    'frame .';
+  justify-content: center;
+  align-content: center;
+  gap: 20px 24px;
+  width: 100%;
+  min-height: 0;
+  padding: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+.frame {
+  grid-area: frame;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  padding: 10px 14px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-frame);
+  box-shadow:
+    0 1px 0 var(--shadow),
+    0 18px 40px -18px var(--shadow);
+}
+
+.frame-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 2px 10px;
+}
+
+.chip {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.board {
+  position: relative;
+  container-type: size;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px var(--border);
+  will-change: transform;
+}
+
+.board canvas {
+  display: block;
+  border-radius: 14px;
+}
+
+/* ==========================================================================
+   Score panel
+   ========================================================================== */
+.scoreboard {
+  grid-area: score;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 12px;
+  padding: 20px 20px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-frame);
+}
+
+.stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stat-label {
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-score {
+  grid-column: 1 / -1;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-score .stat-value {
+  font-size: 54px;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--accent);
+}
+
+.pop-layer {
+  position: absolute;
+  top: 26px;
+  left: 0;
+  right: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.pop {
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: var(--food);
+  font-weight: 800;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  animation: pop-float 900ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+.pop.golden {
+  color: var(--golden);
+  font-size: 22px;
+}
+
+@keyframes pop-float {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.85);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) scale(1);
+  }
+}
+
+.progress {
+  grid-column: 1 / -1;
+}
+
+.progress-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.progress-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-track {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 240ms cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+/* ==========================================================================
+   Overlays on the board
+   ========================================================================== */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 6cqi;
+  border-radius: 14px;
+  pointer-events: none;
+  text-align: center;
+}
+
+#overlay-start {
+  align-items: start;
+  padding-top: 9cqi;
+  background: linear-gradient(var(--scrim), transparent 62%);
+}
+
+#overlay-pause,
+#overlay-over {
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.card {
+  pointer-events: auto;
+  max-width: 100%;
+}
+
+.card-start {
+  pointer-events: none;
+}
+
+.game-title {
+  margin: 0;
+  font-size: clamp(34px, 15cqi, 104px);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+  color: var(--accent);
+}
+
+.prompt {
+  margin: 0.9em 0 0;
+  font-size: clamp(14px, 3.6cqi, 19px);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.start-meta {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 1em 0 0;
+}
+
+.start-meta span {
+  padding: 3px 11px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  color: var(--ink-muted);
+  font-size: clamp(12px, 2.8cqi, 14px);
+  font-weight: 700;
+}
+
+.card-over,
+.card-pause {
+  min-width: min(320px, 100%);
+  padding: clamp(18px, 6cqi, 32px);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 24px 48px -20px var(--shadow);
+  animation: card-in 260ms cubic-bezier(0.2, 0.8, 0.3, 1.1);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+}
+
+.overlay-title {
+  margin: 0;
+  font-size: clamp(24px, 7cqi, 38px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.badge {
+  display: inline-block;
+  margin: 10px 0 0;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--golden);
+  color: #2a1d00;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: center;
+  gap: 4px 28px;
+  margin: 18px 0 22px;
+}
+
+.results div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.results dt {
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.results dd {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.card-pause .actions {
+  margin-top: 18px;
+}
+
+.banner {
+  position: absolute;
+  left: 50%;
+  top: 16%;
+  padding: 0.35em 1em;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: clamp(18px, 6cqi, 32px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 0);
+}
+
+.banner.show {
+  animation: banner 1300ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes banner {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 12px) scale(0.8);
+  }
+  14% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.06);
+  }
+  24% {
+    transform: translate(-50%, 0) scale(1);
+  }
+  78% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -10px) scale(0.98);
+  }
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 700;
+  transition: background-color 120ms, filter 120ms;
+}
+
+.btn:hover {
+  background: var(--surface-sunken);
+}
+
+.btn-primary {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  filter: brightness(1.08);
+}
+
+.btn-quiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-muted);
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink-muted);
+}
+
+.icon-btn:hover {
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ==========================================================================
+   D-pad
+   ========================================================================== */
+.dpad {
+  grid-area: dpad;
+  justify-self: center;
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  grid-template-rows: repeat(3, 52px);
+  grid-template-areas:
+    '. up .'
+    'left . right'
+    '. down .';
+  gap: 6px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.dpad-btn {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dpad-btn:active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.dpad-btn svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 2.4;
+}
+
+.dpad-up {
+  grid-area: up;
+}
+.dpad-down {
+  grid-area: down;
+}
+.dpad-left {
+  grid-area: left;
+}
+.dpad-right {
+  grid-area: right;
+}
+
+/* ==========================================================================
+   Dialogs
+   ========================================================================== */
+dialog {
+  width: min(460px, calc(100% - 32px));
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  box-shadow: 0 30px 70px -20px var(--shadow);
+}
+
+dialog[open] {
+  animation: dialog-in 200ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+dialog::backdrop {
+  background: var(--backdrop);
+  backdrop-filter: blur(2px);
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 22px 20px;
+}
+
+.dialog-body p {
+  margin: 0;
+  color: var(--ink-muted);
+  max-width: 62ch;
+}
+
+.dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-right: -8px;
+}
+
+.dialog-head h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.dialog-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.subhead {
+  margin: 4px 0 -6px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.field {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.field legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.hint {
+  margin-top: 8px !important;
+  font-size: 13px;
+}
+
+.segmented {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--surface-sunken);
+}
+
+.segmented label {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.segmented span {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 6px;
+  border-radius: 10px;
+  color: var(--ink-muted);
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.25;
+  transition: background-color 120ms, color 120ms;
+}
+
+.segmented small {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.segmented input:checked + span {
+  background: var(--surface-raised);
+  color: var(--ink);
+  box-shadow: 0 1px 3px var(--shadow), 0 0 0 1px var(--border);
+}
+
+.segmented input:focus-visible + span {
+  outline: 2.5px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.switches {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.switch + .switch {
+  border-top: 1px solid var(--border);
+}
+
+.switch input {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  margin: 0;
+  border-radius: 99px;
+  background: var(--border);
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.switch input::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+  transition: transform 150ms cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+.switch input:checked {
+  background: var(--accent);
+}
+
+.switch input:checked::after {
+  transform: translateX(18px);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.stats-grid div {
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface-sunken);
+}
+
+.stats-grid dt {
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.stats-grid dd {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  padding: 8px 6px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+thead th {
+  color: var(--ink-muted);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.best-table td:not(:first-child),
+.best-table th:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.best-table td:not(:first-child) {
+  font-weight: 800;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.7em;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.install-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink-muted);
+}
+
+.install-list strong {
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   Small screens: scores in a row above the board, board as large as fits,
+   optional D-pad below.
+   ========================================================================== */
+@media (max-width: 760px) {
+  :root {
+    --titlebar-height: 48px;
+  }
+
+  .brand-name {
+    font-size: 16px;
+  }
+
+  .tool {
+    width: 36px;
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    align-content: stretch;
+    grid-template-areas:
+      'score'
+      'frame'
+      'dpad';
+    gap: 10px;
+    padding: 10px 10px max(12px, env(safe-area-inset-bottom));
+  }
+
+  .frame {
+    align-self: stretch;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .frame-bar {
+    display: none;
+  }
+
+  /* Keep the board right under the scores; the D-pad sits at the bottom within thumb reach. */
+  .stage {
+    place-items: start center;
+  }
+
+  .scoreboard {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px 10px;
+    padding: 10px 14px 12px;
+    border-radius: 16px;
+  }
+
+  .stat-score {
+    grid-column: auto;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  .stat-value,
+  .stat-score .stat-value {
+    font-size: 21px;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  .pop-layer {
+    top: 0;
+  }
+
+  .pop {
+    left: 52%;
+    right: auto;
+    font-size: 15px;
+  }
+
+  .progress-head {
+    display: none;
+  }
+
+  .progress-track {
+    height: 5px;
+  }
+
+  .dpad {
+    grid-template-columns: repeat(3, 64px);
+    grid-template-rows: repeat(3, 50px);
+  }
+}
+
+/* Short landscape phones: keep the board as big as possible. */
+@media (max-height: 520px) and (min-width: 600px) {
+  .layout {
+    padding: 10px 16px;
+  }
+
+  .frame {
+    padding: 6px 8px 8px;
+  }
+
+  .frame-bar {
+    display: none;
+  }
+
+  .stat-score .stat-value {
+    font-size: 36px;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion: system preference or the Animations setting
+   ========================================================================== */
+:root[data-motion='reduced'] *,
+:root[data-motion='reduced'] *::before,
+:root[data-motion='reduced'] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+}
+
+:root[data-motion='reduced'] .pop {
+  display: none;
+}
+
+:root[data-motion='reduced'] .banner.show {
+  animation: banner-static 1300ms steps(1) forwards !important;
+}
+
+@keyframes banner-static {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

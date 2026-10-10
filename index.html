@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Snake</title>
+    <meta name="description" content="A smooth, modern Snake game. Installable, works offline, plays with keyboard, swipes or an on-screen pad." />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#e2e8f0" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#e2e8f0" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#131a27" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Snake" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icons/icon-192.png" sizes="192x192" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&display=swap"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <header class="titlebar">
+        <div class="brand">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect width="32" height="32" rx="9" class="brand-mark-bg" />
+            <g transform="translate(-2.2 1)">
+              <path d="M8 22.5h8a4 4 0 0 0 0-8h-1a4 4 0 0 1 0-8h5" class="brand-mark-body" />
+              <circle cx="20.6" cy="6.5" r="2.5" class="brand-mark-head" />
+              <circle cx="21.5" cy="5.6" r="0.85" class="brand-mark-eye" />
+              <circle cx="27.2" cy="6.5" r="2.2" class="brand-mark-food" />
+            </g>
+          </svg>
+          <span class="brand-name">Snake</span>
+        </div>
+
+        <div class="toolbar" role="toolbar" aria-label="Game controls">
+          <button type="button" class="tool tool-install" id="btn-install" hidden aria-label="Install Snake as an app">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" /></svg>
+            <span>Install</span>
+          </button>
+          <button type="button" class="tool" id="btn-pause" aria-label="Pause" title="Pause (Space)" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-pause"><path d="M9 6v12M15 6v12" /></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-play"><path d="M8 5.5v13l10.5-6.5z" /></svg>
+          </button>
+          <button type="button" class="tool" id="btn-new" aria-label="New game" title="New game">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v4h-4" /></svg>
+          </button>
+          <button type="button" class="tool" id="btn-stats" aria-label="Statistics" title="Statistics">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19.5V12m7 7.5V5m7 14.5v-10" /></svg>
+          </button>
+          <button type="button" class="tool" id="btn-settings" aria-label="Settings" title="Settings (Esc)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 7.5h9m4 0h2M4.5 16.5h2m4 0h9" /><circle cx="15.5" cy="7.5" r="2" /><circle cx="8.5" cy="16.5" r="2" /></svg>
+          </button>
+          <button type="button" class="tool" id="btn-help" aria-label="Help" title="Help">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" /><path d="M9.7 9.6a2.4 2.4 0 1 1 3.4 2.2c-.7.3-1.1.9-1.1 1.6v.4" /><circle cx="12" cy="16.9" r=".4" class="fill" /></svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="frame" aria-labelledby="frame-title">
+          <div class="frame-bar">
+            <h2 class="sr-only" id="frame-title">Game board</h2>
+            <span class="chip" id="chip-mode">Classic walls</span>
+            <span class="chip" id="chip-size">20 × 20</span>
+          </div>
+          <div class="stage" id="stage">
+            <div class="board" id="board">
+              <canvas id="canvas" role="img" aria-label="Snake board"></canvas>
+
+              <div class="banner" id="banner" aria-hidden="true"></div>
+
+              <div class="overlay" id="overlay-start">
+                <div class="card card-start">
+                  <h1 class="game-title">Snake</h1>
+                  <p class="prompt">Press any arrow key or swipe to start</p>
+                  <p class="start-meta">
+                    <span id="start-mode">Classic walls</span>
+                    <span id="start-size">20 × 20</span>
+                  </p>
+                </div>
+              </div>
+
+              <div class="overlay" id="overlay-pause" hidden>
+                <div class="card card-pause">
+                  <h2 class="overlay-title">Paused</h2>
+                  <p class="prompt">Press Space or an arrow key to carry on</p>
+                  <div class="actions">
+                    <button type="button" class="btn btn-primary" id="btn-resume">Resume</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="overlay" id="overlay-over" hidden>
+                <div class="card card-over" role="group" aria-labelledby="over-title">
+                  <h2 class="overlay-title" id="over-title">Game over</h2>
+                  <p class="badge" id="new-best" hidden>New best!</p>
+                  <dl class="results">
+                    <div><dt>Score</dt><dd id="final-score">0</dd></div>
+                    <div><dt>Length</dt><dd id="final-length">3</dd></div>
+                    <div><dt>Level</dt><dd id="final-level">1</dd></div>
+                  </dl>
+                  <div class="actions">
+                    <button type="button" class="btn btn-primary" id="btn-again">Play again</button>
+                    <button type="button" class="btn" id="btn-change">Change settings</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="scoreboard" aria-label="Score">
+          <div class="stat stat-score">
+            <span class="stat-label">Score</span>
+            <span class="stat-value" id="score">0</span>
+            <span class="pop-layer" id="pop-layer" aria-hidden="true"></span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Best</span>
+            <span class="stat-value" id="best">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Level</span>
+            <span class="stat-value" id="level">1</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Length</span>
+            <span class="stat-value" id="length">3</span>
+          </div>
+          <div class="progress">
+            <div class="progress-head">
+              <span id="progress-label">Next level</span>
+              <span class="progress-count" id="progress-count">0 of 5</span>
+            </div>
+            <div
+              class="progress-track"
+              role="progressbar"
+              id="progressbar"
+              aria-label="Progress to the next level"
+              aria-valuemin="0"
+              aria-valuemax="5"
+              aria-valuenow="0"
+            >
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+          </div>
+        </aside>
+
+        <div class="dpad" id="dpad" role="group" aria-label="Direction pad" hidden>
+          <button type="button" class="dpad-btn dpad-up" data-dir="up" aria-label="Up">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14.5 12 8.5l6 6" /></svg>
+          </button>
+          <button type="button" class="dpad-btn dpad-left" data-dir="left" aria-label="Left">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6" /></svg>
+          </button>
+          <button type="button" class="dpad-btn dpad-right" data-dir="right" aria-label="Right">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6" /></svg>
+          </button>
+          <button type="button" class="dpad-btn dpad-down" data-dir="down" aria-label="Down">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6" /></svg>
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <div class="sr-only" id="announcer" aria-live="polite" aria-atomic="true"></div>
+
+    <dialog id="dlg-settings" aria-labelledby="settings-title">
+      <form method="dialog" class="dialog-body" id="settings-form">
+        <header class="dialog-head">
+          <h2 id="settings-title">Settings</h2>
+          <button type="submit" class="icon-btn" aria-label="Close settings">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11m0-11-11 11" /></svg>
+          </button>
+        </header>
+
+        <fieldset class="field">
+          <legend>Board size</legend>
+          <div class="segmented">
+            <label><input type="radio" name="size" value="small" /><span>Small <small>15 × 15</small></span></label>
+            <label><input type="radio" name="size" value="medium" /><span>Medium <small>20 × 20</small></span></label>
+            <label><input type="radio" name="size" value="large" /><span>Large <small>25 × 25</small></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Walls</legend>
+          <div class="segmented">
+            <label><input type="radio" name="wallMode" value="classic" /><span>Classic <small>Walls end the game</small></span></label>
+            <label><input type="radio" name="wallMode" value="wrap" /><span>Wrap <small>Come out the other side</small></span></label>
+          </div>
+          <p class="hint">Changing the board size or walls starts a new game.</p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Theme</legend>
+          <div class="segmented">
+            <label><input type="radio" name="theme" value="system" /><span>System</span></label>
+            <label><input type="radio" name="theme" value="light" /><span>Light</span></label>
+            <label><input type="radio" name="theme" value="dark" /><span>Dark</span></label>
+          </div>
+        </fieldset>
+
+        <div class="field switches">
+          <label class="switch"><span>Sound effects</span><input type="checkbox" name="sound" role="switch" /></label>
+          <label class="switch"><span>Vibration on phones</span><input type="checkbox" name="vibration" role="switch" /></label>
+          <label class="switch"><span>On-screen direction pad</span><input type="checkbox" name="dpad" role="switch" /></label>
+          <label class="switch"><span>Animations</span><input type="checkbox" name="animations" role="switch" /></label>
+          <p class="hint" id="motion-hint" hidden>Your system asks for reduced motion, so shake and particles stay off.</p>
+        </div>
+
+        <footer class="dialog-foot">
+          <button type="submit" class="btn btn-primary">Done</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="dlg-stats" aria-labelledby="stats-title">
+      <form method="dialog" class="dialog-body">
+        <header class="dialog-head">
+          <h2 id="stats-title">Statistics</h2>
+          <button type="submit" class="icon-btn" aria-label="Close statistics">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11m0-11-11 11" /></svg>
+          </button>
+        </header>
+        <dl class="stats-grid">
+          <div><dt>Games played</dt><dd id="st-games">0</dd></div>
+          <div><dt>Food eaten</dt><dd id="st-food">0</dd></div>
+          <div><dt>Longest snake</dt><dd id="st-longest">0</dd></div>
+          <div><dt>Time played</dt><dd id="st-time">0m</dd></div>
+        </dl>
+        <h3 class="subhead">Best scores</h3>
+        <table class="best-table">
+          <thead>
+            <tr><th scope="col">Board</th><th scope="col">Classic</th><th scope="col">Wrap</th></tr>
+          </thead>
+          <tbody id="best-table-body"></tbody>
+        </table>
+        <footer class="dialog-foot">
+          <button type="button" class="btn btn-quiet" id="btn-reset-stats">Reset statistics</button>
+          <button type="submit" class="btn btn-primary">Done</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="dlg-help" aria-labelledby="help-title">
+      <form method="dialog" class="dialog-body">
+        <header class="dialog-head">
+          <h2 id="help-title">How to play</h2>
+          <button type="submit" class="icon-btn" aria-label="Close help">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11m0-11-11 11" /></svg>
+          </button>
+        </header>
+        <p>Eat the fruit to grow. Each fruit is worth 10 points times your level, and every 5 fruit the snake speeds up. A golden fruit appears now and then for a few seconds and is worth five times as much. Don't run into yourself — or, in Classic mode, the walls.</p>
+        <table class="keys-table">
+          <thead><tr><th scope="col">Action</th><th scope="col">Keys</th></tr></thead>
+          <tbody>
+            <tr><td>Steer</td><td><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> or <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></td></tr>
+            <tr><td>Pause or resume</td><td><kbd>Space</kbd> or <kbd>P</kbd></td></tr>
+            <tr><td>Start or play again</td><td><kbd>Enter</kbd></td></tr>
+            <tr><td>Settings</td><td><kbd>Esc</kbd></td></tr>
+            <tr><td>On a phone</td><td>Swipe on the board, or turn on the direction pad in Settings</td></tr>
+          </tbody>
+        </table>
+
+        <h3 class="subhead">Install it as an app</h3>
+        <p>Snake works offline once it has loaded, and opens in its own window when installed.</p>
+        <ul class="install-list">
+          <li><strong>Chrome or Edge:</strong> click <em>Install</em> in the toolbar above, or the install icon at the right of the address bar.</li>
+          <li><strong>Safari on Mac:</strong> choose File → Add to Dock.</li>
+          <li><strong>iPhone and iPad:</strong> tap Share, then Add to Home Screen.</li>
+          <li><strong>Android:</strong> open the browser menu and tap Install app or Add to Home screen.</li>
+        </ul>
+        <footer class="dialog-foot">
+          <button type="submit" class="btn btn-primary">Got it</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
