@@ -105,4 +105,6 @@ The site is served from `/snake-game/`. For a different repository name, a user 
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) — free to use, modify and share.
+
+<p align="center">If you enjoyed it, a ⭐ on the repo is the best way to say thanks.</p>
